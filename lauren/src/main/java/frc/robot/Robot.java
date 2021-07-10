@@ -5,12 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import jdk.nashorn.internal.runtime.JSType;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,21 +17,23 @@ import jdk.nashorn.internal.runtime.JSType;
  * project.
  */
 public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+
   Talon r1 = new Talon(0);
   Talon r2 = new Talon(1);
   Talon l1 = new Talon(8);
   Talon l2 = new Talon(9);
+  Talon other = new Talon(5);
 
-  SpeedControllerGroup right = new SpeedControllerGroup(r1, r2);
-  SpeedControllerGroup left = new SpeedControllerGroup(l1, l2);
+  SpeedControllerGroup r = new SpeedControllerGroup(r1, r2);
+  SpeedControllerGroup l = new SpeedControllerGroup(l1, l2);
 
-  DifferentialDrive dT = new DifferentialDrive(left, right)
+  DifferentialDrive dT = new DifferentialDrive(l, r);
 
-  Joystick driver = new Joystick(0)
+  Joystick driver = new Joystick(0);
+  /**
+   * This function is run when the robot is first started up and should be used for any
+   * initialization code.
+   */
   @Override
   public void robotInit() {}
 
@@ -51,7 +51,51 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    dT.arcadeDrive(driver.getRawAxis(1), driver.getRawAxis(2));
+  
+    
+    
+
+    double speed;
+    double rotation;
+    if (driver.getPOV() == -1){
+      speed = 0.0;
+      rotation = 0.0;
+    }
+    else {
+      speed = 0.8;
+      rotation = driver.getPOV();
+      }
+      if(rotation == 180){
+        rotation = 0;
+        speed = -.8;
+      }
+      else if(rotation == 90){
+       rotation = 1;
+        speed = .8;
+      }
+      else if(rotation == 270){
+        rotation = -1;
+        speed = -.8;}
+        else if (driver.getPOV() == 0){
+          rotation = 0;
+          speed = .8;
+        }
+      
+       
+    dT.arcadeDrive(speed, rotation);
+    
+    double motorSpeed = 0.0;
+    if(driver.getRawButton(1) == true){
+      motorSpeed = .8;
+    }
+    other.setSpeed(motorSpeed);
+    
+    
+    
+    
+
+
+
   }
 
   @Override
@@ -66,6 +110,3 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 }
-
-double controller = driver.getRawAxis(2) - driver.getRawAxis(3);
-dT.arcadeDrive(-controller, driver.getRawAxis(0));

@@ -4,11 +4,15 @@
 
 package frc.robot;
 
+
+
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -24,12 +28,17 @@ public class Robot extends TimedRobot {
   Talon l2 = new Talon(9);
   Talon other = new Talon(5);
 
+  ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+
   SpeedControllerGroup r = new SpeedControllerGroup(r1, r2);
   SpeedControllerGroup l = new SpeedControllerGroup(l1, l2);
 
   DifferentialDrive dT = new DifferentialDrive(l, r);
 
   Joystick driver = new Joystick(0);
+
+  Timer timer = new Timer();
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -41,10 +50,22 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() { 
+    timer.start();
+    timer.reset();
+  }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    
+    if(timer.get() < 4.0){
+      dT.arcadeDrive(.8, 0);
+      
+    }
+    else if(timer.get()<4.5){
+      dT.arcadeDrive(.3, -90);
+    }
+  }
 
   @Override
   public void teleopInit() {}

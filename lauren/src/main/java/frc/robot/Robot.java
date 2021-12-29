@@ -22,19 +22,37 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class Robot extends TimedRobot {
 
+  /**
+   *Instantiates the motor controller objects
+   *r=right motor, l=left motor
+   *given parameter is port on roborio
+   */
   Talon r1 = new Talon(0);
   Talon r2 = new Talon(1);
   Talon l1 = new Talon(8);
   Talon l2 = new Talon(9);
   Talon other = new Talon(5);
 
+  //unncessary gyro
   ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
+  /**
+   * Groups motors together
+   * r = right side, l = left side
+   */
   SpeedControllerGroup r = new SpeedControllerGroup(r1, r2);
   SpeedControllerGroup l = new SpeedControllerGroup(l1, l2);
 
+  /**
+   * Groups speed controllers together into single drive train object
+   * easier to maneuver this way i guess
+   */
   DifferentialDrive dT = new DifferentialDrive(l, r);
 
+  /**
+   * Instantites new driver controller in code so a driver can interact with the robot
+   * Be sure to move the usb to port 0 through driverstation
+   */
   Joystick driver = new Joystick(0);
 
   Timer timer = new Timer();
@@ -55,6 +73,10 @@ public class Robot extends TimedRobot {
     timer.reset();
   }
 
+  /**
+   * function runs every small-number seconds while the robot is enabled and in the autonomous mode
+   * functionally makes robot run for 4 seconds forward at 80% of the full power, then makes it turn left(?) with slight forward velocity for half a second 
+   */
   @Override
   public void autonomousPeriodic() {
     
@@ -70,6 +92,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {}
 
+  /**
+   * runS periodically during teleop period
+   * gets the direction of a single joystick and sets the turning and forward speed accordingly
+   * actually does it twice, the first implementation being half redundant
+   * also the way the driving is done makes it so the turning and movement is updated if and only if the joystick is in the forward, backwrd, left, right, or neutral positions
+   * additionally has the functionality of moving the spare motor at a set speed when a button is pressed
+   */
   @Override
   public void teleopPeriodic() {
   
@@ -102,11 +131,13 @@ public class Robot extends TimedRobot {
           speed = .8;
         }
       
-       
+    //arcade drive's rotation argument takes values from -1.0 to 1.0
+    //might be better if you use trig values and multiply by the 0.8 value for the speed and rotation s.t. speed^2 + rotation^2 = 0.8^2
     dT.arcadeDrive(speed, rotation);
     
     double motorSpeed = 0.0;
     if(driver.getRawButton(1) == true){
+      // the (boolean)==True is logically equivalent to (boolean) so it's redundant
       motorSpeed = .8;
     }
     other.setSpeed(motorSpeed);
